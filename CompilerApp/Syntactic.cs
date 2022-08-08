@@ -126,10 +126,10 @@ public sealed class Syntactic
             }
 
             var quantityOperatorsInCurrentLevel = expressionForCalculate
-                .FindAll(t => t.Level == currentLevel && t.Type == EnumTypeToken.Operator).Count;
+                .FindAll(t => t.Level == currentLevel && t.Type == EnumTypeToken.Identifier).Count;
             if (quantityOperatorsInCurrentLevel == 0) continue;
             var operatorsInCurrentLevel = expressionForCalculate
-                .FindAll(t => t.Level == currentLevel && t.Type == EnumTypeToken.Operator);
+                .FindAll(t => t.Level == currentLevel && t.Type == EnumTypeToken.Identifier);
             foreach (var currentOperator in operatorsInCurrentLevel)
             {
                 var positionOperator = expressionForCalculate.FindIndex(t => t.Id == currentOperator.Id);
@@ -170,14 +170,14 @@ public sealed class Syntactic
         {
             case EnumTypeToken.Identifier:
                 return "'operator' or ')' or ']' or 'LineBreak' or 'EndChain'";
-            case EnumTypeToken.Operator:
-                return "'Identifier' or '(' or '[' or 'exp'";
-            case EnumTypeToken.Bundler:
-                return "'Identifier' or 'operator'";
-            case EnumTypeToken.LineBreak:
-                return "'Identifier' or '(' or 'exp'";
-            case EnumTypeToken.EndOfChain:
-                return null;
+            // case EnumTypeToken:
+            //     return "'Identifier' or '(' or '[' or 'exp'";
+            // case EnumTypeToken.Bundler:
+            //     return "'Identifier' or 'operator'";
+            // case EnumTypeToken.LineBreak:
+            //     return "'Identifier' or '(' or 'exp'";
+            // case EnumTypeToken.EndOfChain:
+            //     return null;
             default:
                 throw new ArgumentOutOfRangeException(nameof(currentSymbolType), currentSymbolType, null);
         }
@@ -207,11 +207,11 @@ public sealed class Syntactic
             Content = "E",
             Level = 0,
         });
-        while (stack.Peek().Content != "$" || token.Type != EnumTypeToken.EndOfChain)
+        while (stack.Peek().Content != "$" || token.Type != EnumTypeToken.Identifier)
         {
             var symbolInExpression = token.Type == EnumTypeToken.Identifier ? "id" : token.Content;
             
-            if (token.Type == EnumTypeToken.LineBreak)
+            if (token.Type == EnumTypeToken.Identifier)
             {
                 if (expression.Count > 0)
                 {
@@ -229,7 +229,7 @@ public sealed class Syntactic
             }
             else if (stack.Peek().Content == symbolInExpression)
             {
-                if (token.Type == EnumTypeToken.Identifier || token.Type == EnumTypeToken.Operator)
+                if (token.Type == EnumTypeToken.Identifier || token.Type == EnumTypeToken.Identifier)
                 {
                     expression.Add(new ExpressionItem()
                     {
