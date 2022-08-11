@@ -1,0 +1,68 @@
+//First
+
+<programa> -> program ident <corpo> .
+<corpo> -> <dc> begin <comandos> end
+<dc> -> <dc_v> <mais_dc>  | λ
+<mais_dc> -> ; <dc> | λ
+<dc_v> ->  <tipo_var> : <variaveis>
+<tipo_var> -> real | integer
+<variaveis> -> ident <mais_var>
+<mais_var> -> , <variaveis> | λ
+<comandos> -> <comando> <mais_comandos>
+<mais_comandos> -> ; <comandos> | λ
+
+<comando> -> 	read (ident) |
+							write (ident) |
+							ident := <expressao>
+							
+<expressao> -> <termo> <outros_termos>
+<termo> -> <op_un> <fator> <mais_fatores>
+<op_un> -> - | λ
+<fator> -> ident | numero_int | numero_real | (<expressao>)
+<outros_termos> -> <op_ad> <termo> <outros_termos> | λ
+<op_ad> -> + | -
+<mais_fatores> -> <op_mul> <fator> <mais_fatores> | λ
+<op_mul> -> * | /
+
+first(<programa>) -> {program}
+first(<corpo>) -> {real, integer}
+first(<dc>) -> {real, integer, λ}
+first(<mais_dc>) -> {;, λ}
+first(<dc_v>) ->  {real, integer}
+first(<tipo_var>) -> {real, integer}
+first(<variaveis>) -> {ident}
+first(<mais_var>) -> {,, λ}
+first(<comandos>) -> {read, write, ident}
+first(<mais_comandos>) -> {;}
+first(<comando>) -> {read, write, ident} 					
+first(<expressao>) -> {ident, (, numero_int, numero_real, -, λ}
+first(<termo>) -> {ident, (, -, numero_int, numero_real, λ}
+first(<op_un>) -> {-, λ}
+first(<fator>) -> {ident, numero_int, numero_real, (}
+first(<outros_termos>) -> {+, -, λ}
+first(<op_ad>) -> {+, -}
+first(<mais_fatores>) -> {*, /, λ}
+first(<op_mul>) -> {*, /}
+
+//Follow
+
+follow(<programa>) -> {$}
+follow(<corpo>) -> {.}
+follow(<dc>) -> {begin, $}
+follow(<mais_dc>) -> follow(dc) -> {begin, $}
+follow(<dc_v>) -> first(mais_dc) -> {begin, ;}
+follow(<tipo_var>) -> {:}
+follow(<mais_var>) -> follow(variaveis) > {;, $}
+follow(<variaveis) -> follow(mais_var) U follow(dc_v) -> {begin, ;}
+follow(<mais_var>) -> follow(variaveis) -> {begin, ;}
+follow(<comandos>) ->  {end}
+follow(<mais_comandos>) -> follow(comandos) -> {end, $}
+follow(<comando>) -> first(mais_comandos) -> {end, ;}
+follow(<expressao>) -> {)} U follow(comando) -> {end, ), ;}
+follow(<op_un>) -> first(fator) -> {ident, numero_int, numero_real, (}
+follow(<op_ad>) -> first(termo) -> {-, ident, (, numero_int, numero_real, $}
+follow(<termo>) -> first(outros_termos) -> {+, -, end, ;, )}
+follow(<outros_termos>) -> {end, ;, ), $}
+follow(<mais_fatores>) -> follow(termo) -> {+, -, end, ;, ), $}
+follow(<fator>) -> first(mais_fatores) -> {*, /, end, ;, ), -, +}
+follow(<op_mul>) -> first(fator) -> {ident, numero_int, numero_real, (}

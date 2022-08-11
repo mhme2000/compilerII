@@ -9,95 +9,84 @@ public sealed class Syntactic
 
     private static readonly Hashtable HashtableSyntactic = new()
     {
-        { new KeyHashtable("E", "+"), null },
-        { new KeyHashtable("E", "-"), null },
-        { new KeyHashtable("E", "*"), null },
-        { new KeyHashtable("E", "/"), null },
-        { new KeyHashtable("E", "exp"), "T EL" },
-        { new KeyHashtable("E", "["), null },
-        { new KeyHashtable("E", "]"), null },
-        { new KeyHashtable("E", "^"), null },
-        { new KeyHashtable("E", "("), "T EL" },
-        { new KeyHashtable("E", ")"), null },
-        { new KeyHashtable("E", "id"), "T EL" },
-        { new KeyHashtable("E", "$"), null },
-        { new KeyHashtable("EL", "+"), "+ T EL" },
-        { new KeyHashtable("EL", "-"), "- T EL" },
-        { new KeyHashtable("EL", "*"), null },
-        { new KeyHashtable("EL", "/"), null },
-        { new KeyHashtable("EL", "exp"), null },
-        { new KeyHashtable("EL", "["), null },
-        { new KeyHashtable("EL", "]"), null },
-        { new KeyHashtable("EL", "^"), null },
-        { new KeyHashtable("EL", "("), null },
-        { new KeyHashtable("EL", ")"), "&" },
-        { new KeyHashtable("EL", "id"), null },
-        { new KeyHashtable("EL", "$"), "&" },
-        { new KeyHashtable("T", "+"), null },
-        { new KeyHashtable("T", "-"), null },
-        { new KeyHashtable("T", "*"), null },
-        { new KeyHashtable("T", "/"), null },
-        { new KeyHashtable("T", "exp"), "P TL" },
-        { new KeyHashtable("T", "["), null },
-        { new KeyHashtable("T", "]"), null },
-        { new KeyHashtable("T", "^"), null },
-        { new KeyHashtable("T", "("), "P TL" },
-        { new KeyHashtable("T", ")"), null },
-        { new KeyHashtable("T", "id"), "P TL" },
-        { new KeyHashtable("T", "$"), null },
-        { new KeyHashtable("TL", "+"), "&" },
-        { new KeyHashtable("TL", "-"), "&" },
-        { new KeyHashtable("TL", "*"), "* P TL" },
-        { new KeyHashtable("TL", "/"), "/ P TL" },
-        { new KeyHashtable("TL", "exp"), null },
-        { new KeyHashtable("TL", "["), null },
-        { new KeyHashtable("TL", "]"), null },
-        { new KeyHashtable("TL", "^"), null },
-        { new KeyHashtable("TL", "("), null },
-        { new KeyHashtable("TL", ")"), "&" },
-        { new KeyHashtable("TL", "id"), null },
-        { new KeyHashtable("TL", "$"), "&" },
-        { new KeyHashtable("P", "+"), null },
-        { new KeyHashtable("P", "-"), null },
-        { new KeyHashtable("P", "*"), null },
-        { new KeyHashtable("P", "/"), null },
-        { new KeyHashtable("P", "exp"), "exp [ F ]" },
-        { new KeyHashtable("P", "["), null },
-        { new KeyHashtable("P", "]"), null },
-        { new KeyHashtable("P", "^"), null },
-        { new KeyHashtable("P", "("), "F PL" },
-        { new KeyHashtable("P", ")"), null },
-        { new KeyHashtable("P", "id"), "F PL" },
-        { new KeyHashtable("P", "$"), null },
-        { new KeyHashtable("PL", "+"), "&" },
-        { new KeyHashtable("PL", "-"), "&" },
-        { new KeyHashtable("PL", "*"), "&" },
-        { new KeyHashtable("PL", "/"), "&" },
-        { new KeyHashtable("PL", "exp"), null },
-        { new KeyHashtable("PL", "["), null },
-        { new KeyHashtable("PL", "]"), null },
-        { new KeyHashtable("PL", "^"), "^ F PL" },
-        { new KeyHashtable("PL", "("), null },
-        { new KeyHashtable("PL", ")"), "&" },
-        { new KeyHashtable("PL", "id"), null },
-        { new KeyHashtable("PL", "$"), "&" },
-        { new KeyHashtable("F", "+"), null },
-        { new KeyHashtable("F", "-"), null },
-        { new KeyHashtable("F", "*"), null },
-        { new KeyHashtable("F", "/"), null },
-        { new KeyHashtable("F", "exp"), null },
-        { new KeyHashtable("F", "["), null },
-        { new KeyHashtable("F", "]"), null },
-        { new KeyHashtable("F", "^"), null },
-        { new KeyHashtable("F", "("), "( E )" },
-        { new KeyHashtable("F", ")"), null },
-        { new KeyHashtable("F", "id"), "id" },
-        { new KeyHashtable("F", "$"), null }
+        { new KeyHashtable("programa", "program"), "program ident corpo ." },
+        { new KeyHashtable("corpo", "real"), "dc begin comandos end" },
+        { new KeyHashtable("corpo", "integer"), "dc begin comandos end" },
+        { new KeyHashtable("dc", "begin"), "&" },
+        { new KeyHashtable("dc", "real"), "dc_v mais_dc" },
+        { new KeyHashtable("dc", "integer"), "dc_v mais_dc" },
+        { new KeyHashtable("dc", "$"), "&" },
+        { new KeyHashtable("mais_dc", "begin"), "&" },
+        { new KeyHashtable("mais_dc", ";"), "; dc" },
+        { new KeyHashtable("mais_dc", "$"), "&" },
+        { new KeyHashtable("dc_v", "real"), "tipo_var : variaveis" },
+        { new KeyHashtable("dc_v", "integer"), "tipo_var : variaveis" },
+        { new KeyHashtable("tipo_var", "real"), "real" },
+        { new KeyHashtable("tipo_var", "integer"), "integer" },
+        { new KeyHashtable("variaveis", "ident"), "ident mais_var" },
+        { new KeyHashtable("mais_var", ";"), "&" },
+        { new KeyHashtable("mais_var", ","), ", variaveis" },
+        { new KeyHashtable("mais_var", "$"), "&" },
+        { new KeyHashtable("comandos", "ident"), "comando mais_comandos" },
+        { new KeyHashtable("comandos", "read"), "comando mais_comandos" },
+        { new KeyHashtable("comandos", "write"), "comando mais_comandos" },
+        { new KeyHashtable("mais_comandos", "end"), "&" },
+        { new KeyHashtable("mais_comandos", ";"), "; comandos" },
+        { new KeyHashtable("mais_comandos", "$"), "&" },
+        { new KeyHashtable("comando", "ident"), "ident := expressao" },
+        { new KeyHashtable("comando", "read"), "read ( ident )" },
+        { new KeyHashtable("comando", "write"), "write ( ident )" },
+        { new KeyHashtable("expressao", "end"), "termo outros_termos" },
+        { new KeyHashtable("expressao", ";"), "termo outros_termos" },
+        { new KeyHashtable("expressao", ")"), "termo outros_termos" },
+        { new KeyHashtable("expressao", "-"), "termo outros_termos" },
+        { new KeyHashtable("expressao", "ident"), "termo outros_termos" },
+        { new KeyHashtable("expressao", "("), "termo outros_termos" },
+        { new KeyHashtable("expressao", "numero_int"), "termo outros_termos" },
+        { new KeyHashtable("expressao", "numero_real"), "termo outros_termos" },
+        { new KeyHashtable("termo", "end"), "op_un fator mais_fatores" },
+        { new KeyHashtable("termo", ";"), "op_un fator mais_fatores" },
+        { new KeyHashtable("termo", ")"), "op_un fator mais_fatores" },
+        { new KeyHashtable("termo", "("), "op_un fator mais_fatores" },
+        { new KeyHashtable("termo", "-"), "op_un fator mais_fatores" },
+        { new KeyHashtable("termo", "+"), "op_un fator mais_fatores" },
+        { new KeyHashtable("termo", "ident"), "op_un fator mais_fatores" },
+        { new KeyHashtable("termo", "numero_int"), "op_un fator mais_fatores" },
+        { new KeyHashtable("termo", "numero_real"), "op_un fator mais_fatores" },
+        { new KeyHashtable("op_un", "ident"), "&" },
+        { new KeyHashtable("op_un", "("), "&" },
+        { new KeyHashtable("op_un", "-"), "-" },
+        { new KeyHashtable("op_un", "numero_int"), "&" },
+        { new KeyHashtable("op_un", "numero_real"), "&" },
+        { new KeyHashtable("op_un", "$"), "&" },
+        { new KeyHashtable("fator", "ident"), "ident" },
+        { new KeyHashtable("fator", "("), "( expressao )" },
+        { new KeyHashtable("fator", "numero_int"), "numero_int" },
+        { new KeyHashtable("fator", "numero_real"), "numero_real" },
+        { new KeyHashtable("outros_termos", "end"), "&" },
+        { new KeyHashtable("outros_termos", ";"), "&" },
+        { new KeyHashtable("outros_termos", ")"), "&" },
+        { new KeyHashtable("outros_termos", "-"), "op_ad termo outros_termos" },
+        { new KeyHashtable("outros_termos", "+"), "op_ad termo outros_termos" },
+        { new KeyHashtable("outros_termos", "$"), "&" },
+        { new KeyHashtable("op_ad", "-"), "-" },
+        { new KeyHashtable("op_ad", "+"), "+" },
+        { new KeyHashtable("mais_fatores", "end"), "&" },
+        { new KeyHashtable("mais_fatores", ";"), "&" },
+        { new KeyHashtable("mais_fatores", ")"), "&" },
+        { new KeyHashtable("mais_fatores", "-"), "&" },
+        { new KeyHashtable("mais_fatores", "+"), "&" },
+        { new KeyHashtable("mais_fatores", "*"), "op_mul fator mais_fatores" },
+        { new KeyHashtable("mais_fatores", "/"), "op_mul fator mais_fatores" },
+        { new KeyHashtable("mais_fatores", "$"), "&" },
+        { new KeyHashtable("op_mul", "*"), "*" },
+        { new KeyHashtable("op_mul", "/"), "/" },
+
     };
     
     private static readonly List<string> Terminals = new()
     {
-        "+", "-", "*", "/", "exp", "[", "]", "^", "(", ")", "id", "$"
+        "program", "ident", "begin", "end", ".", ";", ":", "real", "integer", "read", "(", ")", "write", ":=", "-", "numero_int", "numero_real", "+", "*", "/", ",", "$"
     };
     #endregion
     
@@ -164,24 +153,24 @@ public sealed class Syntactic
         return string.Empty;
     }
     
-    private static string? NextExpectedToken(EnumTypeToken currentSymbolType)
-    {
-        switch (currentSymbolType)
-        {
-            case EnumTypeToken.Identifier:
-                return "'operator' or ')' or ']' or 'LineBreak' or 'EndChain'";
-            // case EnumTypeToken:
-            //     return "'Identifier' or '(' or '[' or 'exp'";
-            // case EnumTypeToken.Bundler:
-            //     return "'Identifier' or 'operator'";
-            // case EnumTypeToken.LineBreak:
-            //     return "'Identifier' or '(' or 'exp'";
-            // case EnumTypeToken.EndOfChain:
-            //     return null;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(currentSymbolType), currentSymbolType, null);
-        }
-    }
+    // private static string? NextExpectedToken(EnumTypeToken currentSymbolType)
+    // {
+    //     switch (currentSymbolType)
+    //     {
+    //         case EnumTypeToken.Identifier:
+    //             return "'operator' or ')' or ']' or 'LineBreak' or 'EndChain'";
+    //         // case EnumTypeToken:
+    //         //     return "'Identifier' or '(' or '[' or 'exp'";
+    //         // case EnumTypeToken.Bundler:
+    //         //     return "'Identifier' or 'operator'";
+    //         // case EnumTypeToken.LineBreak:
+    //         //     return "'Identifier' or '(' or 'exp'";
+    //         // case EnumTypeToken.EndOfChain:
+    //         //     return null;
+    //         default:
+    //             throw new ArgumentOutOfRangeException(nameof(currentSymbolType), currentSymbolType, null);
+    //     }
+    // }
     #endregion
     
     public Syntactic(string inputFileName)
@@ -195,7 +184,7 @@ public sealed class Syntactic
         var tokenPosition = -1;
         var stack = new Stack<StackItem>();
         var token = _lexScanner.NextToken();
-        var nextExpectedToken = NextExpectedToken(token.Type);
+        // var nextExpectedToken = NextExpectedToken(token.Type);
         var lineOfCode = 1;
         stack.Push(new StackItem()
         {
@@ -204,42 +193,54 @@ public sealed class Syntactic
         });
         stack.Push(new StackItem()
         {
-            Content = "E",
+            Content = "programa",
             Level = 0,
         });
-        while (stack.Peek().Content != "$" || token.Type != EnumTypeToken.Identifier)
+        while (stack.Peek().Content != "$")
         {
-            var symbolInExpression = token.Type == EnumTypeToken.Identifier ? "id" : token.Content;
-            
-            if (token.Type == EnumTypeToken.Identifier)
+            var symbolInExpression = token.Content;
+            switch (token.Type)
             {
-                if (expression.Count > 0)
-                {
-                    Console.WriteLine(Calculate(expression));
-                    expression.Clear();
-                    stack.Push(new StackItem()
-                    {
-                        Content = "E",
-                        Level = 0,
-                    });
-                    tokenPosition = -1;
-                    lineOfCode++;
-                }
-                token = _lexScanner.NextToken();
+                case EnumTypeToken.Identifier:
+                    symbolInExpression = "ident";
+                    break;
+                case EnumTypeToken.Integer:
+                    symbolInExpression = "numero_int";
+                    break;
+                case EnumTypeToken.Real:
+                    symbolInExpression = "numero_real";
+                    break;
             }
-            else if (stack.Peek().Content == symbolInExpression)
+
+            // if (token.Type == EnumTypeToken.Identifier)
+            // {
+            //     if (expression.Count > 0)
+            //     {
+            //         Console.WriteLine(Calculate(expression));
+            //         expression.Clear();
+            //         stack.Push(new StackItem()
+            //         {
+            //             Content = "E",
+            //             Level = 0,
+            //         });
+            //         tokenPosition = -1;
+            //         lineOfCode++;
+            //     }
+            //     token = _lexScanner.NextToken();
+            // }
+            if (stack.Peek().Content == symbolInExpression)
             {
-                if (token.Type == EnumTypeToken.Identifier || token.Type == EnumTypeToken.Identifier)
-                {
-                    expression.Add(new ExpressionItem()
-                    {
-                        Id = Guid.NewGuid(),
-                        Value = token.Content,
-                        Level = stack.Peek().Level,
-                        Type = token.Type
-                    });
-                    tokenPosition++;
-                }
+                // if (token.Type == EnumTypeToken.Identifier || token.Type == EnumTypeToken.Identifier)
+                // {
+                //     expression.Add(new ExpressionItem()
+                //     {
+                //         Id = Guid.NewGuid(),
+                //         Value = token.Content,
+                //         Level = stack.Peek().Level,
+                //         Type = token.Type
+                //     });
+                //     tokenPosition++;
+                // }
 
                 stack.Pop();
                 token = _lexScanner.NextToken();
@@ -251,7 +252,7 @@ public sealed class Syntactic
             else
             {
                 var rules = HashtableSyntactic[new KeyHashtable(stack.Peek().Content, symbolInExpression)];
-                if (rules == null) throw new Exception($"Syntactic Error in line {lineOfCode}, {nextExpectedToken} was expected, but found '{token.Content}'");
+                if (rules == null) throw new Exception($"Syntactic Error in line {lineOfCode},  was expected, but found '{token.Content}'");
                 var fatherLevel = stack.Peek().Level;
                 stack.Pop();
                 var rulesSeparated = rules.ToString()?.Split(' ');
@@ -266,23 +267,23 @@ public sealed class Syntactic
                             Level = fatherLevel + 1,
                         });
                     }
-                    else
-                    {
-                        if (token.Content != "$" || stack.Peek().Content != "$")
-                        {
-                            expression[tokenPosition].Level -= 1;
-                        }
-                    }
+                    // else
+                    // {
+                    //     if (token.Content != "$" || stack.Peek().Content != "$")
+                    //     {
+                    //         expression[tokenPosition].Level -= 1;
+                    //     }
+                    // }
                 }
             }
         }
 
         if (_lexScanner.Position < _lexScanner.ContentFile.Length)
         {
-            throw new Exception($"Syntactic Error in line {lineOfCode}, {nextExpectedToken} was expected, but found '{token.Content}'");
+            throw new Exception($"Syntactic Error in line {lineOfCode}, was expected, but found '{token.Content}'");
         }
 
-        Console.WriteLine(Calculate(expression));
+        // Console.WriteLine(Calculate(expression));
         Console.WriteLine("Build success!");
     }
 }
