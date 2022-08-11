@@ -25,6 +25,7 @@ public sealed class Syntactic
         { new KeyHashtable("tipo_var", "integer"), "integer" },
         { new KeyHashtable("variaveis", "ident"), "ident mais_var" },
         { new KeyHashtable("mais_var", ";"), "&" },
+        { new KeyHashtable("mais_var", "begin"), "&" },
         { new KeyHashtable("mais_var", ","), ", variaveis" },
         { new KeyHashtable("mais_var", "$"), "&" },
         { new KeyHashtable("comandos", "ident"), "comando mais_comandos" },
@@ -83,13 +84,13 @@ public sealed class Syntactic
         { new KeyHashtable("op_mul", "/"), "/" },
 
     };
-    
+
     private static readonly List<string> Terminals = new()
     {
         "program", "ident", "begin", "end", ".", ";", ":", "real", "integer", "read", "(", ")", "write", ":=", "-", "numero_int", "numero_real", "+", "*", "/", ",", "$"
     };
     #endregion
-    
+
     #region private_methods
     private static double ResolveExpression(string operating1, string operator1, string? operating2 = null)
     {
@@ -152,7 +153,7 @@ public sealed class Syntactic
         }
         return string.Empty;
     }
-    
+
     // private static string? NextExpectedToken(EnumTypeToken currentSymbolType)
     // {
     //     switch (currentSymbolType)
@@ -172,12 +173,12 @@ public sealed class Syntactic
     //     }
     // }
     #endregion
-    
+
     public Syntactic(string inputFileName)
     {
         _lexScanner = new Lex(inputFileName);
     }
-    
+
     public void CheckSyntax()
     {
         var expression = new List<ExpressionItem>();
