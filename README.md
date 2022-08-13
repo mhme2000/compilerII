@@ -1,7 +1,9 @@
 # Simple calculator compiler 
 Project related to the final work of the Compilers II discipline.
 
-To run the program use ```dotnet run --project CompilerApp``` or ```dotnet run --project CompilerApp {fileName}```.
+To run the program in mode compiler use ```dotnet run --project CompilerApp compiler``` or ```dotnet run --project CompilerApp {inputFileName}```.
+
+To run the program in mode executor use ```dotnet run --project CompilerApp executor``` or ```dotnet run --project CompilerApp {outputFileName}```.
 
  ### Table M
 

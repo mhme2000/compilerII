@@ -1,12 +1,24 @@
 ﻿namespace CompilerApp;
 public static class Program
 {
-    private static void Main(string[] args)
+    static void Main(string[] args)
     {
-        Console.WriteLine("Starting compiler...");
-        var fileName = args.Length > 0 ? args[0] : @"input.txt";
-        var syntactic = new Syntactic(fileName);
-        syntactic.CheckSyntax();
-        new Interpreter(fileName).Execute();
+        if (args.Length <= 0) return;
+        var mode = args[0];
+        var input = args.Length > 1 ? args[1] : "input.txt";
+        var output = args.Length > 2 ? args[2] : "output.txt";
+        switch (mode)
+        {
+            case "executor":
+                Console.WriteLine("Starting executor...");
+                new Executor(output).Execute();
+                break;
+            case "compiler":
+            {
+                Console.WriteLine("Starting compiler...");
+                new Syntactic(input, output).CheckSyntax();
+                break;
+            }
+        }
     }
 }

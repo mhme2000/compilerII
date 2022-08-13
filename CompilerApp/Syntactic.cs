@@ -1,13 +1,14 @@
 ﻿using System.Collections;
-using System.Globalization;
 
 namespace CompilerApp;
 public sealed class Syntactic
 {
     #region private_variables
     private static Lex _lexScanner = null!;
-
-    private readonly Dictionary<string, Symbol> SymbolTable = new();
+    private List<string> _c = new();
+    private int _s = -1;
+    private string _outputFileName;
+    private readonly Dictionary<string, Symbol> _symbolTable = new();
     private static readonly Hashtable HashtableSyntactic = new()
     {
         { new KeyHashtable("programa", "program"), "program ident corpo ." },
@@ -47,7 +48,7 @@ public sealed class Syntactic
         { new KeyHashtable("expressao", "numero_int"), "termo outros_termos" },
         { new KeyHashtable("expressao", "numero_real"), "termo outros_termos" },
         { new KeyHashtable("termo", "end"), "op_un fator mais_fatores" },
-        { new KeyHashtable("termo", ";"), "op_un fator mais_fatores" },
+        { new KeyHashtable("termo", ";"), "op_un fator mais_fatores" }, 
         { new KeyHashtable("termo", ")"), "op_un fator mais_fatores" },
         { new KeyHashtable("termo", "("), "op_un fator mais_fatores" },
         { new KeyHashtable("termo", "-"), "op_un fator mais_fatores" },
@@ -92,15 +93,17 @@ public sealed class Syntactic
     };
     #endregion
     
-    public Syntactic(string inputFileName)
+    public Syntactic(string inputFileName, string outputFileName)
     {
         _lexScanner = new Lex(inputFileName);
+        _outputFileName = outputFileName;
     }
     
     public void CheckSyntax()
     {
         var stack = new Stack<StackItem>();
         var token = _lexScanner.NextToken();
+        var lastIdentifier = string.Empty;
         stack.Push(new StackItem()
         {
             Content = "$",
@@ -109,6 +112,7 @@ public sealed class Syntactic
         {
             Content = "programa",
         });
+        _c = _c.Append("INPP").ToList();
         var symbolTerminalFather = stack.Peek();
         while (stack.Peek().Content != "$")
         {
@@ -122,20 +126,67 @@ public sealed class Syntactic
 
             if (stack.Peek().Content == symbolInExpression)
             {
-                if (token.Type == EnumTypeToken.Identifier)
+                if (token.Content == ".")
                 {
-                    switch (symbolTerminalFather.Content)
-                    {
-                        case "variaveis" when SymbolTable.ContainsKey(token.Content):
-                            throw new Exception($"Semantic error, identifier '{token.Content}' has already been declared.");
-                        case "variaveis":
-                            SymbolTable.Add(token.Content, new Symbol { Type = token.Type, Value = token.Content});
-                            break;
-                        case "comando" when !SymbolTable.ContainsKey(token.Content):
-                            throw new Exception($"Semantic error, identifier '{token.Content}' was not declared.");
-                        case "fator" when !SymbolTable.ContainsKey(token.Content):
-                            throw new Exception($"Semantic error, identifier '{token.Content}' was not declared.");
-                    }
+                    _c = _c.Append("PARA").ToList();
+                }
+
+                if (symbolTerminalFather.Content == "op_un" && token.Content == "-")
+                {
+                    _c = _c.Append("INVE").ToList();
+                }
+
+                switch (token.Type)
+                {
+                    case EnumTypeToken.Symbol:
+                        _c = token.Content switch
+                        {
+                            "+" => _c.Append("SOMA").ToList(),
+                            "-" => _c.Append("SUBT").ToList(),
+                            "*" => _c = _c.Append("MULT").ToList(),
+                            "/" =>  _c = _c.Append("DIVI").ToList(),
+                            ":=" =>  _c = _c.Append($"ARMZ {_symbolTable[lastIdentifier].EndRel}").ToList(),
+                            _ => _c
+                        };
+                        break;
+                    case EnumTypeToken.Identifier:
+                        lastIdentifier = token.Content;
+                        switch (symbolTerminalFather.Content)
+                        {
+                            case "variaveis" when _symbolTable.ContainsKey(token.Content):
+                                throw new Exception($"Semantic error, identifier '{token.Content}' has already been declared.");
+                            case "variaveis":
+                                _c = _c.Append("ALME 1").ToList();
+                                _symbolTable.Add(token.Content, new Symbol { Type = token.Type, Value = token.Content, EndRel = ++_s});
+                                break;
+                            case "comando" when !_symbolTable.ContainsKey(token.Content):
+                                throw new Exception($"Semantic error, identifier '{token.Content}' was not declared.");
+                            case "fator" when !_symbolTable.ContainsKey(token.Content):
+                                throw new Exception($"Semantic error, identifier '{token.Content}' was not declared.");
+                            case "fator":
+                                _c = _c.Append($"CRVL {_symbolTable[lastIdentifier].EndRel}").ToList();
+                                break;
+                        }
+
+                        break;
+                    case EnumTypeToken.ReservedKeyword:
+                        _s++; 
+                        switch (token.Content)
+                        {
+                            case "read":
+                                _c = _c.Append("LEIT").ToList();
+                                _c = _c.Append($"ARMZ {_symbolTable[lastIdentifier].EndRel}").ToList();
+                                break;
+                            case "write":
+                                _c = _c.Append($"CRVL {_symbolTable[lastIdentifier].EndRel}").ToList();
+                                _c = _c.Append("IMPR").ToList();
+                                break;
+                        }
+
+                        break;
+                    case EnumTypeToken.Integer or EnumTypeToken.Real:
+                        _c = _c.Append($"CRCT {token.Content}").ToList();
+                        break;
                 }
                 stack.Pop();
                 token = _lexScanner.NextToken();
@@ -169,6 +220,7 @@ public sealed class Syntactic
         {
             throw new Exception($"Syntactic Error");
         }
+        File.WriteAllLines(_outputFileName, _c.ToArray());
         Console.WriteLine("Build success!");
     }
 }
