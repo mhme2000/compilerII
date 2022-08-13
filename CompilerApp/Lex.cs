@@ -11,7 +11,7 @@ public class Lex
     #region private_methods
     private static bool IsDigit(char c)
     {
-        return (c >= '0' && c <= '9');
+        return c is >= '0' and <= '9';
     }
 
     private static bool IsLetter(char c)
@@ -21,7 +21,7 @@ public class Lex
 
     private static bool IsSpace(char c)
     {
-        return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+        return c is ' ' or '\t' or '\r' or '\n';
     }
 
     private static bool IsSymbol(char c)

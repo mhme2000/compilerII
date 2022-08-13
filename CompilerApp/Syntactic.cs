@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Globalization;
 
 namespace CompilerApp;
 public sealed class Syntactic
@@ -7,6 +6,7 @@ public sealed class Syntactic
     #region private_variables
     private static Lex _lexScanner = null!;
 
+    private readonly Dictionary<string, Symbol> SymbolTable = new();
     private static readonly Hashtable HashtableSyntactic = new()
     {
         { new KeyHashtable("programa", "program"), "program ident corpo ." },
@@ -90,89 +90,6 @@ public sealed class Syntactic
     };
     #endregion
     
-    #region private_methods
-    private static double ResolveExpression(string operating1, string operator1, string? operating2 = null)
-    {
-        return operator1 switch
-        {
-            "+" => Convert.ToDouble(operating1) + Convert.ToDouble(operating2),
-            "-" => Convert.ToDouble(operating1) - Convert.ToDouble(operating2),
-            "*" => Convert.ToDouble(operating1) * Convert.ToDouble(operating2),
-            "/" => Convert.ToDouble(operating1) / Convert.ToDouble(operating2),
-            "^" => Math.Pow(Convert.ToDouble(operating1), Convert.ToDouble(operating2)),
-            "exp" => Math.Exp(Convert.ToDouble(operating1)),
-            _ => double.NaN
-        };
-    }
-    private static string Calculate(List<ExpressionItem> expressionForCalculate)
-    {
-        var maxLevel = expressionForCalculate.Max(t => t.Level);
-        for (var currentLevel = maxLevel; currentLevel >= 0; currentLevel--)
-        {
-            if (expressionForCalculate.Count == 1)
-            {
-                return expressionForCalculate[0].Value;
-            }
-
-            var quantityOperatorsInCurrentLevel = expressionForCalculate
-                .FindAll(t => t.Level == currentLevel && t.Type == EnumTypeToken.Identifier).Count;
-            if (quantityOperatorsInCurrentLevel == 0) continue;
-            var operatorsInCurrentLevel = expressionForCalculate
-                .FindAll(t => t.Level == currentLevel && t.Type == EnumTypeToken.Identifier);
-            foreach (var currentOperator in operatorsInCurrentLevel)
-            {
-                var positionOperator = expressionForCalculate.FindIndex(t => t.Id == currentOperator.Id);
-                if (currentOperator.Value == "exp")
-                {
-                    var result = ResolveExpression(expressionForCalculate[positionOperator + 1].Value,
-                        expressionForCalculate[positionOperator].Value);
-                    expressionForCalculate.RemoveAt(positionOperator + 1);
-                    expressionForCalculate[positionOperator] = new ExpressionItem()
-                    {
-                        Id = Guid.NewGuid(),
-                        Value = result.ToString(CultureInfo.InvariantCulture),
-                        Type = EnumTypeToken.Identifier
-                    };
-                }
-                else
-                {
-                    var result = ResolveExpression(expressionForCalculate[positionOperator - 1].Value,
-                        expressionForCalculate[positionOperator].Value,
-                        expressionForCalculate[positionOperator + 1].Value);
-                    expressionForCalculate.RemoveRange(positionOperator - 1, 2);
-                    expressionForCalculate[positionOperator - 1] = new ExpressionItem()
-                    {
-                        Id = Guid.NewGuid(),
-                        Value = result.ToString(CultureInfo.InvariantCulture),
-                        Type = EnumTypeToken.Identifier
-                    };
-                }
-
-            }
-        }
-        return string.Empty;
-    }
-    
-    // private static string? NextExpectedToken(EnumTypeToken currentSymbolType)
-    // {
-    //     switch (currentSymbolType)
-    //     {
-    //         case EnumTypeToken.Identifier:
-    //             return "'operator' or ')' or ']' or 'LineBreak' or 'EndChain'";
-    //         // case EnumTypeToken:
-    //         //     return "'Identifier' or '(' or '[' or 'exp'";
-    //         // case EnumTypeToken.Bundler:
-    //         //     return "'Identifier' or 'operator'";
-    //         // case EnumTypeToken.LineBreak:
-    //         //     return "'Identifier' or '(' or 'exp'";
-    //         // case EnumTypeToken.EndOfChain:
-    //         //     return null;
-    //         default:
-    //             throw new ArgumentOutOfRangeException(nameof(currentSymbolType), currentSymbolType, null);
-    //     }
-    // }
-    #endregion
-    
     public Syntactic(string inputFileName)
     {
         _lexScanner = new Lex(inputFileName);
@@ -180,80 +97,56 @@ public sealed class Syntactic
     
     public void CheckSyntax()
     {
-        var expression = new List<ExpressionItem>();
-        var tokenPosition = -1;
         var stack = new Stack<StackItem>();
         var token = _lexScanner.NextToken();
-        // var nextExpectedToken = NextExpectedToken(token.Type);
-        var lineOfCode = 1;
         stack.Push(new StackItem()
         {
             Content = "$",
-            Level = 0,
         });
         stack.Push(new StackItem()
         {
             Content = "programa",
-            Level = 0,
         });
+        var symbolTerminalFather = stack.Peek();
         while (stack.Peek().Content != "$")
         {
-            var symbolInExpression = token.Content;
-            switch (token.Type)
+            var symbolInExpression = token.Type switch
             {
-                case EnumTypeToken.Identifier:
-                    symbolInExpression = "ident";
-                    break;
-                case EnumTypeToken.Integer:
-                    symbolInExpression = "numero_int";
-                    break;
-                case EnumTypeToken.Real:
-                    symbolInExpression = "numero_real";
-                    break;
-            }
+                EnumTypeToken.Identifier => "ident",
+                EnumTypeToken.Integer => "numero_int",
+                EnumTypeToken.Real => "numero_real",
+                _ => token.Content
+            };
 
-            // if (token.Type == EnumTypeToken.Identifier)
-            // {
-            //     if (expression.Count > 0)
-            //     {
-            //         Console.WriteLine(Calculate(expression));
-            //         expression.Clear();
-            //         stack.Push(new StackItem()
-            //         {
-            //             Content = "E",
-            //             Level = 0,
-            //         });
-            //         tokenPosition = -1;
-            //         lineOfCode++;
-            //     }
-            //     token = _lexScanner.NextToken();
-            // }
             if (stack.Peek().Content == symbolInExpression)
             {
-                // if (token.Type == EnumTypeToken.Identifier || token.Type == EnumTypeToken.Identifier)
-                // {
-                //     expression.Add(new ExpressionItem()
-                //     {
-                //         Id = Guid.NewGuid(),
-                //         Value = token.Content,
-                //         Level = stack.Peek().Level,
-                //         Type = token.Type
-                //     });
-                //     tokenPosition++;
-                // }
-
+                if (token.Type == EnumTypeToken.Identifier)
+                {
+                    switch (symbolTerminalFather.Content)
+                    {
+                        case "variaveis" when SymbolTable.ContainsKey(token.Content):
+                            throw new Exception($"Semantic error, identifier '{token.Content}' has already been declared.");
+                        case "variaveis":
+                            SymbolTable.Add(token.Content, new Symbol { Type = token.Type, Value = token.Content});
+                            break;
+                        case "comando" when !SymbolTable.ContainsKey(token.Content):
+                            throw new Exception($"Semantic error, identifier '{token.Content}' was not declared.");
+                        case "fator" when !SymbolTable.ContainsKey(token.Content):
+                            throw new Exception($"Semantic error, identifier '{token.Content}' was not declared.");
+                    }
+                }
                 stack.Pop();
                 token = _lexScanner.NextToken();
             }
             else if (Terminals.Contains(stack.Peek().Content))
             {
-                throw new Exception($"Syntactic Error in line {lineOfCode}, '{stack.Peek().Content}' was expected, but found '{token.Content}'");
+                throw new Exception($"Syntactic Error '{stack.Peek().Content}' was expected, but found '{token.Content}'");
             }
             else
             {
                 var rules = HashtableSyntactic[new KeyHashtable(stack.Peek().Content, symbolInExpression)];
-                if (rules == null) throw new Exception($"Syntactic Error in line {lineOfCode},  was expected, but found '{token.Content}'");
-                var fatherLevel = stack.Peek().Level;
+                if (rules == null) throw new Exception($"Syntactic Error");
+                symbolTerminalFather = stack.Peek();
                 stack.Pop();
                 var rulesSeparated = rules.ToString()?.Split(' ');
                 if (rulesSeparated == null) continue;
@@ -264,26 +157,16 @@ public sealed class Syntactic
                         stack.Push(new StackItem()
                         {
                             Content = rulesSeparated[i],
-                            Level = fatherLevel + 1,
                         });
                     }
-                    // else
-                    // {
-                    //     if (token.Content != "$" || stack.Peek().Content != "$")
-                    //     {
-                    //         expression[tokenPosition].Level -= 1;
-                    //     }
-                    // }
                 }
             }
         }
 
         if (_lexScanner.Position < _lexScanner.ContentFile.Length)
         {
-            throw new Exception($"Syntactic Error in line {lineOfCode}, was expected, but found '{token.Content}'");
+            throw new Exception($"Syntactic Error");
         }
-
-        // Console.WriteLine(Calculate(expression));
         Console.WriteLine("Build success!");
     }
 }
