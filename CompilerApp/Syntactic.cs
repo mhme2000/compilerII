@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Globalization;
 
 namespace CompilerApp;
 public sealed class Syntactic
@@ -25,6 +26,7 @@ public sealed class Syntactic
         { new KeyHashtable("tipo_var", "integer"), "integer" },
         { new KeyHashtable("variaveis", "ident"), "ident mais_var" },
         { new KeyHashtable("mais_var", ";"), "&" },
+        { new KeyHashtable("mais_var", "begin"), "&" },
         { new KeyHashtable("mais_var", ","), ", variaveis" },
         { new KeyHashtable("mais_var", "$"), "&" },
         { new KeyHashtable("comandos", "ident"), "comando mais_comandos" },
